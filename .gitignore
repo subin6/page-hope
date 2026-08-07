@@ -1,0 +1,18 @@
+# Raw arrow-rendering strips: MPEG-4 Part 2, which browsers cannot decode.
+# media/videos/ is generated from these (or, preferably, from the renderer's
+# PNG dumps) by scripts/build_videos.py.
+# Leading slash matters — an unanchored "videos/" would also ignore media/videos/.
+/videos/
+
+# Inference arrays exported from opentouch; media/force/ is generated from them
+# by scripts/build_force_data.py. See README for the export command.
+/data/npz/
+
+.DS_Store
+__pycache__/
+
+# internal working notes, not for the public repo
+CLAUDE.md
+
+# internal build/regeneration notes: names server-side paths
+DEVELOPING.md

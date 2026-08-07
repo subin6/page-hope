@@ -1,0 +1,112 @@
+{
+  "gopro_20": {
+    "width": 1144,
+    "height": 240,
+    "fps": 20.0,
+    "frames": 150,
+    "duration": 7.5,
+    "panels": [
+      "input",
+      "pressure",
+      "contact",
+      "arrows"
+    ],
+    "source": "frames:gopro_20",
+    "webm": true,
+    "thumb": 6.1
+  },
+  "rashult_20": {
+    "width": 1144,
+    "height": 240,
+    "fps": 20.0,
+    "frames": 150,
+    "duration": 7.5,
+    "panels": [
+      "input",
+      "pressure",
+      "contact",
+      "arrows"
+    ],
+    "source": "frames:rashult_20",
+    "webm": true,
+    "thumb": 6.2
+  },
+  "segment_018": {
+    "width": 1144,
+    "height": 240,
+    "fps": 20.0,
+    "frames": 120,
+    "duration": 6.0,
+    "panels": [
+      "input",
+      "pressure",
+      "contact",
+      "arrows"
+    ],
+    "source": "frames:segment_018",
+    "webm": true,
+    "thumb": 8.4
+  },
+  "segment_037": {
+    "width": 1144,
+    "height": 240,
+    "fps": 20.0,
+    "frames": 120,
+    "duration": 6.0,
+    "panels": [
+      "input",
+      "pressure",
+      "contact",
+      "arrows"
+    ],
+    "source": "frames:segment_037",
+    "webm": true,
+    "thumb": 7.4
+  },
+  "video_0": {
+    "width": 1144,
+    "height": 240,
+    "fps": 20.0,
+    "frames": 121,
+    "duration": 6.05,
+    "panels": [
+      "input",
+      "pressure",
+      "contact",
+      "arrows"
+    ],
+    "source": "frames:video_0",
+    "webm": true,
+    "thumb": 5.0
+  },
+  "gopro_20_pair": {
+    "width": 1650,
+    "height": 480,
+    "fps": 20.0,
+    "frames": 150,
+    "duration": 7.5,
+    "panels": [
+      "input",
+      "left",
+      "right"
+    ],
+    "source": "frames:gopro_20_combined",
+    "webm": true,
+    "thumb": 6.3
+  },
+  "rashult_20_pair": {
+    "width": 1650,
+    "height": 480,
+    "fps": 20.0,
+    "frames": 150,
+    "duration": 7.5,
+    "panels": [
+      "input",
+      "left",
+      "right"
+    ],
+    "source": "frames:rashult_20_combined",
+    "webm": true,
+    "thumb": 6.4
+  }
+}

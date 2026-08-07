@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HOPE: Hand-Object Pressure Estimation from Monocular Videos</title>
+<meta name="description" content="HOPE predicts per-vertex contact and normal pressure on the MANO hand mesh from monocular RGB video, unifying tactile-glove pressure, planar-sensor pressure, and hand-object contact supervision in a single vertex space.">
+<meta name="keywords" content="hand pressure estimation, contact estimation, hand-object interaction, tactile, MANO, video transformer">
+<meta property="og:title" content="HOPE: Hand-Object Pressure Estimation from Monocular Videos">
+<meta property="og:description" content="Per-vertex contact and normal pressure on the hand mesh, predicted from monocular RGB video — no tactile sensing at test time.">
+<meta property="og:image" content="./media/posters/gopro_20.jpg">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://subin6.github.io/page-hope/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="./static/css/index.css">
+<link rel="icon" type="image/svg+xml" href="./static/images/favicon.svg">
+<script>document.documentElement.className += ' js';</script>
+</head>
+<body>
+
+<!-- ============================================================== hero -->
+<header class="hero">
+  <div class="container">
+    <h1 class="hero__title">
+      <span class="brand-grad">HOPE</span>: Hand-Object Pressure Estimation<br class="wide-only">
+      from Monocular Videos
+    </h1>
+    <p class="hero__venue">Preprint, 2026</p>
+    <p class="hero__authors">
+      <a href="https://sites.google.com/yonsei.ac.kr/subinjeon/home">Subin Jeon</a><sup>1</sup>&nbsp;&middot;&nbsp;
+      <a href="https://bjkim95.github.io/">Byungjun Kim</a><sup>1</sup>&nbsp;&middot;&nbsp;
+      <a href="https://jhugestar.github.io/">Hanbyul Joo</a><sup>1,2</sup>
+    </p>
+    <p class="hero__affil"><sup>1</sup>Seoul National University&nbsp;&nbsp;&nbsp;<sup>2</sup>RLWRLD</p>
+
+    <nav class="links" aria-label="Paper resources">
+      <a class="btn" href="https://arxiv.org/abs/2608.06192">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span>arXiv</span>
+      </a>
+      <a class="btn" href="#" aria-disabled="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.79 23.39c.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5 1 .11-.78.42-1.31.76-1.61-2.66-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.81 5.63-5.49 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.21.7.82.58A12 12 0 0 0 12 .5z"/></svg>
+        <span>Code <small>(soon)</small></span>
+      </a>
+      <a class="btn" href="#" aria-disabled="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        <span>Model <small>(soon)</small></span>
+      </a>
+    </nav>
+
+    <figure class="figure reveal">
+      <img src="./static/images/fig1-teaser.webp"
+           srcset="./static/images/fig1-teaser.webp 950w, ./static/images/fig1-teaser@2x.webp 1900w"
+           sizes="(max-width: 1080px) 100vw, 1080px"
+           width="1900" height="597"
+           alt="From RGB video to hand-object force and contact: input frames beside predicted contact and force on the hand mesh, shown at the posed and rest pose.">
+      <figcaption>
+        <b>From RGB video to hand-object force and contact.</b> HOPE predicts vertex-level contact and
+        force on the hand mesh without tactile sensing at test time. Pink vertices denote contact, and
+        arrows indicate the aggregate force magnitude computed from the sum of predicted vertex-level
+        force values.
+      </figcaption>
+    </figure>
+
+    <div class="tldr reveal">
+      <p>
+        <span class="tldr__label">TL;DR</span>
+        HOPE predicts per-vertex contact and pressure on the MANO hand mesh from monocular RGB video
+        &mdash; supervised mostly on gloved hands, yet transferring to bare-hand egocentric and
+        in-the-wild video through heterogeneous force&ndash;contact supervision.
+      </p>
+    </div>
+  </div>
+</header>
+
+<!-- ========================================================== abstract -->
+<section class="section section--tint">
+  <div class="container container--narrow">
+    <h2 class="section-title reveal">Abstract</h2>
+    <div class="prose prose--justify reveal">
+      <p>
+        Estimating physical pressure from vision is essential for understanding contact-rich
+        hand-object interaction. However, prior vision-based pressure estimation methods are largely
+        limited to planar surfaces and single image input, making them difficult to apply to dynamic
+        hand-object interaction with diverse objects. We instead formulate pressure estimation as a
+        <b>hand-centric video prediction problem</b> with monocular video as input. This formulation
+        predicts temporally evolving per-vertex normal pressure and contact directly on the hand mesh,
+        yielding a unified output space independent of object shape and sensor layout.
+      </p>
+      <p>
+        Building on this formulation, we propose <b>HOPE</b>, a framework with two key components.
+        First, we lift tactile-glove pressure, planar-sensor pressure, and distance-based hand-object
+        contact annotations into a shared hand vertex space, allowing bare-hand contact data to
+        regularize pressure learning where metric labels are unavailable. Second, we introduce a
+        <b>vertex-anchored video transformer</b> that treats each vertex as a persistent token,
+        aggregates visual features and hand pose over time, and uses a contact-gated pressure head to
+        enforce that pressure vanishes without contact.
+      </p>
+      <p>
+        Experiments on OpenTouch, PressureVisionDB, and hand-object contact benchmarks demonstrate that
+        HOPE supports a common hand-centric representation across object-pressure, surface-pressure,
+        and contact-supervised HOI settings. Despite using metric pressure supervision primarily from
+        gloved-hand videos, HOPE generalizes to bare-hand egocentric and in-the-wild videos, producing
+        joint contact and pressure predictions beyond the scope of contact-only or planar-pressure
+        baselines.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================== in the wild -->
+<section class="section" id="wild">
+  <div class="container container--wide">
+    <h2 class="section-title reveal">Pressure and contact in the wild</h2>
+    <p class="section-lede reveal">
+      Monocular RGB in, per-vertex force and contact out. No tactile glove, no instrumented surface,
+      no known object &mdash; and no ground truth to fit to. Arrow length is the aggregate force of each
+      finger region; the same predictions are shown as a per-vertex pressure field and a contact mask.
+    </p>
+
+    <div class="reveal">
+      <div class="clip clip--single">
+        <div class="clip__inner">
+          <video id="wildVideo" loop muted playsinline preload="metadata"
+                 poster="./media/posters/gopro_20.jpg"
+                 width="1144" height="240"
+                 aria-label="Predicted force vectors, pressure field, and contact regions on an in-the-wild video"></video>
+          <div class="clip__labels">
+            <span>Input video</span>
+            <span class="is-ours">Pressure&nbsp;(kPa)</span>
+            <span class="is-contact">Contact</span>
+            <span class="is-ours">Aggregated force</span>
+          </div>
+        </div>
+      </div>
+      <p class="hint swipe-hint">Swipe the panel sideways to compare all four views.</p>
+
+      <div class="strip" id="wildStrip" role="tablist" aria-label="Select a clip"></div>
+
+      <div class="legend">
+        <span class="legend__item">
+          <span class="legend__ramp" aria-hidden="true"></span>
+          low &rarr; high pressure
+        </span>
+        <span class="legend__item">
+          <span class="legend__swatch" aria-hidden="true"></span>
+          predicted contact
+        </span>
+        <span class="legend__item">
+          <span class="legend__arrows" aria-hidden="true">
+            <i style="background:#e04a4a"></i><i style="background:#f0912e"></i><i style="background:#ecc93a"></i><i style="background:#4fae57"></i><i style="background:#4a72e0"></i>
+          </span>
+          arrows per finger: thumb, index, middle, ring, pinky
+        </span>
+      </div>
+      <p class="hint">Clips are held-out egocentric and in-the-wild videos; hand pose comes from an off-the-shelf reconstructor.</p>
+    </div>
+
+    <div class="reveal" style="margin-top:3.6rem">
+      <h3 class="subhead" style="text-align:center">Both hands, shared force scale</h3>
+      <p class="section-lede" style="margin-bottom:1.4rem">
+        Each hand is predicted separately, the left one by mirroring the video through the same
+        right-hand model.
+      </p>
+      <div class="clip clip--pair">
+        <div class="clip__inner">
+          <video id="pairVideo" loop muted playsinline preload="none"
+                 poster="./media/posters/gopro_20_pair.jpg"
+                 width="1650" height="480"
+                 aria-label="Predicted force vectors on both hands, rendered at a shared scale"></video>
+          <div class="clip__labels">
+            <span>Input video</span>
+            <span class="is-ours">Left hand</span>
+            <span class="is-ours">Right hand</span>
+          </div>
+        </div>
+      </div>
+      <div class="strip" id="pairStrip" role="tablist" aria-label="Select a two-hand clip"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================== explorer -->
+<section class="section" id="explore">
+  <div class="container container--wide">
+    <h2 class="section-title reveal">Explore a prediction</h2>
+    <p class="section-lede reveal">
+      One timeline, three views of the same output: the input frame, the hand mesh
+      carrying the per-vertex field, and the force aggregated over hand regions.
+      Drag the hand to orbit it, drag the plot to scrub.
+    </p>
+
+    <div class="explore reveal">
+      <div class="explore__stage">
+        <figure class="explore__pane explore__pane--video">
+          <div class="explore__crop">
+            <video id="exVideo" loop muted playsinline preload="metadata"
+                   width="1144" height="240"
+                   aria-label="Input video for the selected clip"></video>
+          </div>
+          <figcaption>Input video</figcaption>
+        </figure>
+
+        <figure class="explore__pane explore__pane--viewer">
+          <div class="explore__canvas-wrap">
+            <canvas id="exCanvas" aria-label="Predicted hand mesh, drag to orbit"></canvas>
+            <p class="explore__status" id="exStatus" hidden>Loading force data&hellip;</p>
+            <button type="button" class="explore__reset" id="exReset" title="Reset view">Reset view</button>
+          </div>
+          <figcaption>
+            <span class="seg" role="group" aria-label="Mesh colouring">
+              <button type="button" class="seg__btn is-active" data-mesh="pressure" aria-pressed="true">Pressure</button>
+              <button type="button" class="seg__btn" data-mesh="contact" aria-pressed="false">Contact</button>
+            </span>
+            <label class="toggle"><input type="checkbox" id="exArrows" checked> Force vectors</label>
+          </figcaption>
+        </figure>
+      </div>
+
+      <div class="transport">
+        <button type="button" class="transport__play" id="exPlay" data-state="paused" aria-label="Play or pause">
+          <svg class="ic-play" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <svg class="ic-pause" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+        </button>
+        <input type="range" class="transport__scrub" id="exScrub" min="0" max="1000" value="0"
+               aria-label="Seek within the clip">
+        <span class="transport__time mono" id="exTime">0.00 / 0.00 s</span>
+      </div>
+
+      <div class="plot">
+        <div class="plot__head">
+          <p class="plot__title">Aggregated force<span class="plot__unit">sum of predicted vertex-level force</span></p>
+          <span class="seg" role="group" aria-label="Plot granularity">
+            <button type="button" class="seg__btn" data-granularity="region" aria-pressed="false">6 regions</button>
+            <button type="button" class="seg__btn is-active" data-granularity="sub" aria-pressed="true">18 subregions</button>
+          </span>
+        </div>
+        <div id="exPlot"></div>
+        <div class="plot-parts">
+          <span><svg width="26" height="6"><line x1="1" y1="3" x2="25" y2="3" stroke="currentColor" stroke-width="2"/></svg> tip</span>
+          <span><svg width="26" height="6"><line x1="1" y1="3" x2="25" y2="3" stroke="currentColor" stroke-width="2" stroke-dasharray="5 3"/></svg> mid</span>
+          <span><svg width="26" height="6"><line x1="1" y1="3" x2="25" y2="3" stroke="currentColor" stroke-width="2" stroke-dasharray="1.5 3"/></svg> base</span>
+        </div>
+        <div class="plot-legend" id="exLegend" aria-label="Regions and their value at the playhead"></div>
+      </div>
+
+      <div class="strip" id="exStrip" aria-label="Select a clip"></div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== method -->
+<section class="section section--tint" id="method">
+  <div class="container">
+    <h2 class="section-title reveal">Method</h2>
+    <p class="section-lede reveal">
+      Pressure and contact are predicted as per-vertex fields on the MANO mesh. This shared output
+      space is what allows heterogeneous supervision &mdash; two sensor-specific pressure sources and
+      contact-only HOI data &mdash; to train a single model.
+    </p>
+
+    <figure class="figure reveal">
+      <img src="./static/images/fig2-method.webp"
+           srcset="./static/images/fig2-method.webp 850w, ./static/images/fig2-method@2x.webp 1700w"
+           sizes="(max-width: 1080px) 100vw, 1080px"
+           width="1700" height="938" loading="lazy"
+           alt="Method overview: heterogeneous force and contact supervision lifted to MANO vertex space, then a vertex-anchored transformer fusing DINOv3 patch tokens with HaWoR-derived vertex tokens.">
+      <figcaption>
+        <b>Method overview.</b> (a) <b>Unified Hand Pressure&ndash;Contact Annotation.</b> Heterogeneous
+        force and contact supervision is lifted into a shared MANO vertex space.
+        (b) <b>VertexFormer.</b> DINOv3 patch tokens and HaWoR-derived vertex tokens are fused via
+        interleaved spatial and temporal attention.
+      </figcaption>
+    </figure>
+
+    <div class="cards">
+      <div class="card reveal">
+        <div class="card__num">01</div>
+        <h3>Unified pressure&ndash;contact annotation</h3>
+        <p>
+          A single annotation space, shared across sensors and unifying pressure with contact.
+          Tactile-glove taxels and planar-sensor readings are lifted onto MANO vertices on a common
+          scale; thresholding that pressure yields contact, which joins distance-based contact from
+          hand-object data.
+        </p>
+      </div>
+      <div class="card reveal">
+        <div class="card__num">02</div>
+        <h3>Vertex-anchored video transformer</h3>
+        <p>
+          <b>VertexFormer</b> learns the mapping between hand geometry and image evidence. Vertex
+          self-attention relates vertices to one another, while vertex-to-patch cross-attention reads
+          the full patch grid. Finally, temporal attention learns how each vertex evolves over time
+          &mdash; pre-load, load, release.
+        </p>
+      </div>
+      <div class="card reveal">
+        <div class="card__num is-contact">03</div>
+        <h3>Contact-gated force prediction</h3>
+        <p>
+          The pressure head is gated by the contact head,
+          <span class="mono">p&#770; = c&#770; &odot; p&#771;</span>, building the physical prior that
+          pressure vanishes without contact into the architecture rather than leaving it to be learned.
+          This is what makes contact-only supervision pay off for pressure: those labels reach vertices
+          no force sensor ever covered.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================== results -->
+<section class="section" id="results">
+  <div class="container">
+    <h2 class="section-title reveal">Results</h2>
+    <p class="section-lede reveal">
+      Evaluated across three settings that no prior method covers jointly: hand-object pressure with a
+      wearable tactile glove, hand-surface pressure on an instrumented plane, and bare-hand contact.
+    </p>
+
+    <!-- OpenTouch -->
+    <div class="reveal" style="margin-top:2.4rem">
+      <p class="eyebrow">Hand-object pressure</p>
+      <h3 class="subhead">OpenTouch</h3>
+      <p class="prose">
+        Our main target setting. The gap over baselines is largest at the vertex level: PressureVision
+        predicts a 2D planar map and cannot transfer to mesh vertices, while HACO reaches high recall
+        but over-predicts contact regions on gloved hands.
+      </p>
+
+      <figure class="figure">
+        <img src="./static/images/fig3-opentouch.webp"
+             srcset="./static/images/fig3-opentouch.webp 750w, ./static/images/fig3-opentouch@2x.webp 1500w"
+             sizes="(max-width: 1080px) 100vw, 1080px"
+             width="1500" height="857" loading="lazy"
+             alt="Qualitative comparison on OpenTouch: contact predictions from ours and HACO, and force predictions from ours and PressureVision, against ground truth.">
+        <figcaption><b>Qualitative comparison on OpenTouch.</b> (a) Vertex-level contact. (b) Vertex-level pressure.</figcaption>
+      </figure>
+
+      <div class="table-wrap">
+        <table>
+          <caption><b>Table 1.</b> Hand-object force estimation on OpenTouch. Force errors in parentheses are (contact region / non-contact region).</caption>
+          <thead>
+            <tr class="group">
+              <th></th><th colspan="3">Frame-level contact</th><th colspan="3">Vertex-level contact</th><th colspan="2">Vertex-level force</th>
+            </tr>
+            <tr>
+              <th>Method</th><th>F1</th><th>P</th><th>R</th><th>F1</th><th>P</th><th>R</th><th>MAE (kPa)</th><th>RMSE (kPa)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>PressureVision</td><td>0.610</td><td>0.725</td><td>0.527</td>
+              <td>0.013</td><td>0.213</td><td>0.007</td>
+              <td>1.93 <span class="sub">(8.03&nbsp;/&nbsp;0.14)</span></td><td>6.19 <span class="sub">(12.94&nbsp;/&nbsp;0.59)</span></td>
+            </tr>
+            <tr>
+              <td>PressureVision++</td><td>0.113</td><td>0.744</td><td>0.061</td>
+              <td>0.0013</td><td>0.386</td><td>0.001</td>
+              <td>1.92 <span class="sub">(8.04&nbsp;/&nbsp;0.12)</span></td><td>6.20 <span class="sub">(12.95&nbsp;/&nbsp;0.60)</span></td>
+            </tr>
+            <tr>
+              <td>HACO</td><td>0.835</td><td>0.720</td><td class="best">0.994</td>
+              <td>0.361</td><td>0.256</td><td>0.611</td>
+              <td class="dash">&ndash;</td><td class="dash">&ndash;</td>
+            </tr>
+            <tr class="is-ours">
+              <td>HOPE (ours)</td><td class="best">0.874</td><td class="best">0.817</td><td>0.940</td>
+              <td class="best">0.660</td><td class="best">0.647</td><td class="best">0.673</td>
+              <td class="best">1.808 <span class="sub">(5.84&nbsp;/&nbsp;0.61)</span></td><td class="best">4.998 <span class="sub">(10.13&nbsp;/&nbsp;1.39)</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Generalization -->
+    <div class="reveal" style="margin-top:3.4rem">
+      <p class="eyebrow">Generalization</p>
+      <h3 class="subhead">Bare hands, from contact-only supervision</h3>
+      <p class="prose">
+        Pressure supervision comes almost entirely from gloved hands. Adding contact-only HOI data
+        costs essentially nothing in-domain but takes bare-hand vertex-level contact on ARCTIC from
+        0.069 to 0.498 &mdash; a 7&times; improvement, and the reason HOPE transfers to the in-the-wild
+        clips above.
+      </p>
+
+      <figure class="figure">
+        <img src="./static/images/fig6-generalization.webp"
+             srcset="./static/images/fig6-generalization.webp 1000w, ./static/images/fig6-generalization@2x.webp 2000w"
+             sizes="(max-width: 1080px) 100vw, 1080px"
+             width="2000" height="469" loading="lazy"
+             alt="Generalization to bare-hand object interaction, comparing models trained with and without bare-hand contact supervision on ARCTIC and in-the-wild videos.">
+        <figcaption>
+          <b>Generalization to bare-hand object interaction.</b> We compare predictions from models
+          trained without (OT) and with (OT&nbsp;+&nbsp;HOI) bare-hand contact supervision on ARCTIC
+          (left, with ground-truth contact) and in-the-wild videos (right, no ground truth available).
+        </figcaption>
+      </figure>
+
+      <div class="table-wrap">
+        <table>
+          <caption>
+            <b>Table 2.</b> Training-data composition. <b>OT</b>: OpenTouch (force), <b>PV</b>:
+            PressureVisionDB (force), <b>HOI</b>: DexYCB + ARCTIC (contact only).
+          </caption>
+          <thead>
+            <tr class="group">
+              <th colspan="3">Training data</th><th colspan="3">OpenTouch</th><th colspan="2">PVDB</th><th colspan="2">ARCTIC (bare hand)</th>
+            </tr>
+            <tr>
+              <th>OT</th><th>PV</th><th>HOI</th>
+              <th>Frame F1</th><th>Vertex F1</th><th>MAE</th>
+              <th>Frame F1</th><th>MAE</th>
+              <th>Frame F1</th><th>Vertex F1</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="check">&#10003;</td><td class="dash">&ndash;</td><td class="dash">&ndash;</td>
+              <td>0.871</td><td>0.657</td><td class="best">1.840</td>
+              <td>0.725</td><td>0.822</td>
+              <td>0.835</td><td>0.137</td>
+            </tr>
+            <tr>
+              <td class="check">&#10003;</td><td class="check">&#10003;</td><td class="dash">&ndash;</td>
+              <td class="best">0.878</td><td class="best">0.672</td><td>1.841</td>
+              <td class="best">0.908</td><td class="best">0.265</td>
+              <td>0.765</td><td>0.069</td>
+            </tr>
+            <tr class="is-ours">
+              <td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td>
+              <td>0.876</td><td>0.671</td><td>1.866</td>
+              <td>0.892</td><td>0.285</td>
+              <td class="best">0.947</td><td class="best">0.498</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Collapsed extras -->
+    <div class="reveal" style="margin-top:3rem">
+      <details class="more">
+        <summary>Hand-surface pressure on PressureVisionDB <span>&mdash; Table 3, Fig. 4</span></summary>
+        <div class="more__body">
+          <p class="prose">
+            The same vertex-space model is competitive on frame-level contact and achieves the lowest
+            vertex-level force errors, despite predicting in a hand-centric space rather than the
+            sensor's native 2D image space. PressureVision keeps an advantage on pixel-level IoU
+            because projecting mesh vertices back to the pad introduces hand-reconstruction error that
+            planar methods avoid.
+          </p>
+          <figure class="figure">
+            <img src="./static/images/fig4-pressurevision.webp"
+                 srcset="./static/images/fig4-pressurevision.webp 850w, ./static/images/fig4-pressurevision@2x.webp 1700w"
+                 sizes="(max-width: 1080px) 100vw, 1080px"
+                 width="1700" height="374" loading="lazy"
+                 alt="Qualitative comparison on PressureVision, with vertex-level predictions projected onto the image plane.">
+            <figcaption><b>Qualitative comparison on PressureVision.</b> Our vertex-level predictions are projected onto the image plane for comparison.</figcaption>
+          </figure>
+          <div class="table-wrap">
+            <table>
+              <caption><b>Table 3.</b> Hand-surface force estimation on PressureVisionDB.</caption>
+              <thead>
+                <tr class="group">
+                  <th></th><th colspan="3">Frame-level contact</th><th colspan="2">Pixel-level IoU</th><th colspan="2">Vertex-level force</th>
+                </tr>
+                <tr><th>Method</th><th>F1</th><th>P</th><th>R</th><th>Contact</th><th>Volume</th><th>MAE (kPa)</th><th>RMSE (kPa)</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>PressureVision</td><td class="best">0.939</td><td class="best">0.977</td><td>0.904</td><td class="best">0.547</td><td class="best">0.411</td><td>0.471</td><td>3.726</td></tr>
+                <tr><td>PressureVision++</td><td>0.248</td><td>0.963</td><td>0.143</td><td>0.022</td><td>0.021</td><td class="best">0.248</td><td>3.025</td></tr>
+                <tr class="is-ours"><td>HOPE (ours)</td><td>0.905</td><td>0.891</td><td class="best">0.920</td><td>0.328</td><td>0.218</td><td>0.449</td><td class="best">2.314</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== bibtex -->
+<section class="section section--tint" id="bibtex">
+  <div class="container container--narrow">
+    <h2 class="section-title reveal" style="text-align:left">BibTeX</h2>
+    <div class="bibtex reveal">
+      <button class="copy-btn" id="copyBibtex" type="button">Copy</button>
+<pre><code id="bibtexCode">@article{jeon2026hope,
+  title   = {HOPE: Hand-Object Pressure Estimation from Monocular Videos},
+  author  = {Jeon, Subin and Kim, Byungjun and Joo, Hanbyul},
+  journal = {arXiv preprint arXiv:2608.06192},
+  year    = {2026}
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>
+    Figures and quantitative results are taken from the paper. Videos show predictions on held-out
+    egocentric and in-the-wild footage; hand pose is estimated with an off-the-shelf reconstructor.
+  </p>
+  <p>
+    Page template adapted from the
+    <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> project page, licensed under
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.
+  </p>
+</footer>
+
+<script src="./static/js/index.js" defer></script>
+<script src="./static/js/explore.js" defer></script>
+</body>
+</html>
