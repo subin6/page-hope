@@ -43,11 +43,11 @@ and fill well inside a frame, and it keeps the page dependency-free.
 ## Citation
 
 ```bibtex
-@article{jeon2026hope,
-  title   = {HOPE: Hand-Object Pressure Estimation from Monocular Videos},
-  author  = {Jeon, Subin and Kim, Byungjun and Joo, Hanbyul},
-  journal = {arXiv preprint arXiv:2608.06192},
-  year    = {2026}
+@inproceedings{jeon2026hope,
+  title     = {HOPE: Hand-Object Pressure Estimation from Monocular Videos},
+  author    = {Jeon, Subin and Kim, Byungjun and Joo, Hanbyul},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2026}
 }
 ```
 
