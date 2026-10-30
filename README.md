@@ -2,7 +2,7 @@
 
 Project page for **HOPE: Hand-Object Pressure Estimation from Monocular Videos**.
 
-🔗 **[Project page](https://subin6.github.io/page-hope/)** · **[arXiv](https://arxiv.org/abs/2608.06192)**
+🔗 **[Project page](https://subin6.github.io/page-hope/)** · **[arXiv](https://arxiv.org/abs/2608.06192)** · **[Code](https://github.com/subin6/hope)**
 
 HOPE predicts per-vertex contact and pressure on the MANO hand mesh from monocular RGB
 video. The page carries the paper's figures and tables, result clips on in-the-wild
