@@ -326,46 +326,7 @@ a:hover { text-decoration: underline; }
 .card h3 { font-size: 1.03rem; margin: 0 0 0.55rem; }
 .card p { font-size: 0.9rem; line-height: 1.55; color: var(--ink-soft); margin: 0; }
 
-/* ----------------------------------------------------------------- tables */
-
-.table-wrap {
-  overflow-x: auto;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-  margin-top: 1.4rem;
-}
-table { border-collapse: collapse; width: 100%; font-size: 0.86rem; }
-caption {
-  caption-side: top;
-  text-align: left;
-  padding: 1rem 1.15rem 0.7rem;
-  font-size: 0.85rem;
-  color: var(--ink-faint);
-  line-height: 1.5;
-}
-caption b { color: var(--ink-soft); }
-th, td { padding: 0.5rem 0.85rem; text-align: right; white-space: nowrap; }
-th:first-child, td:first-child { text-align: left; }
-thead th {
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  border-bottom: 1px solid var(--border);
-}
-thead tr.group th { text-transform: none; letter-spacing: 0; color: var(--ink-soft); border-bottom: none; padding-bottom: 0.15rem; }
-tbody td { font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--ink-soft); border-top: 1px solid var(--border); }
-tbody td:first-child { font-family: var(--font-sans); color: var(--ink); }
-tbody tr.is-ours td { background: var(--accent-soft); color: var(--ink); font-weight: 600; }
-tbody tr.is-ours td:first-child { color: var(--accent); }
-td.best, th.best { font-weight: 700; color: var(--ink); }
-tbody tr.is-ours td.best { color: var(--accent); }
-td .sub { font-size: 0.78em; color: var(--ink-faint); font-weight: 400; }
-.check { color: var(--accent); }
-.dash { color: var(--ink-faint); }
+/* ------------------------------------------------------------- disclosure */
 
 details.more {
   border: 1px solid var(--border);
@@ -399,7 +360,6 @@ details.more[open] > summary::before { transform: rotate(45deg); }
 details.more > summary span { font-weight: 400; color: var(--ink-faint); font-size: 0.85rem; }
 .more__body { padding: 0 1.2rem 1.4rem; }
 .more__body .figure { margin-top: 0.4rem; }
-.more__body .table-wrap { box-shadow: none; }
 
 /* ----------------------------------------------------------------- bibtex */
 
@@ -537,8 +497,6 @@ details.more > summary span { font-weight: 400; color: var(--ink-faint); font-si
 .seg__btn:hover { color: var(--ink); }
 .seg__btn.is-active { background: var(--accent); color: #fff; }
 
-/* Not `.check` — the result tables use td.check for their tick marks, and
-   display:inline-flex on a <td> drops it out of the table's column model. */
 .toggle { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; cursor: pointer; }
 .toggle input { accent-color: var(--accent); }
 

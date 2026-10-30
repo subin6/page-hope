@@ -341,41 +341,6 @@
         <figcaption><b>Qualitative comparison on OpenTouch.</b> (a) Vertex-level contact. (b) Vertex-level pressure.</figcaption>
       </figure>
 
-      <div class="table-wrap">
-        <table>
-          <caption><b>Table 1.</b> Hand-object force estimation on OpenTouch. Force errors in parentheses are (contact region / non-contact region).</caption>
-          <thead>
-            <tr class="group">
-              <th></th><th colspan="3">Frame-level contact</th><th colspan="3">Vertex-level contact</th><th colspan="2">Vertex-level force</th>
-            </tr>
-            <tr>
-              <th>Method</th><th>F1</th><th>P</th><th>R</th><th>F1</th><th>P</th><th>R</th><th>MAE (kPa)</th><th>RMSE (kPa)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>PressureVision</td><td>0.610</td><td>0.725</td><td>0.527</td>
-              <td>0.013</td><td>0.213</td><td>0.007</td>
-              <td>1.93 <span class="sub">(8.03&nbsp;/&nbsp;0.14)</span></td><td>6.19 <span class="sub">(12.94&nbsp;/&nbsp;0.59)</span></td>
-            </tr>
-            <tr>
-              <td>PressureVision++</td><td>0.113</td><td>0.744</td><td>0.061</td>
-              <td>0.0013</td><td>0.386</td><td>0.001</td>
-              <td>1.92 <span class="sub">(8.04&nbsp;/&nbsp;0.12)</span></td><td>6.20 <span class="sub">(12.95&nbsp;/&nbsp;0.60)</span></td>
-            </tr>
-            <tr>
-              <td>HACO</td><td>0.835</td><td>0.720</td><td class="best">0.994</td>
-              <td>0.361</td><td>0.256</td><td>0.611</td>
-              <td class="dash">&ndash;</td><td class="dash">&ndash;</td>
-            </tr>
-            <tr class="is-ours">
-              <td>HOPE (ours)</td><td class="best">0.874</td><td class="best">0.817</td><td>0.940</td>
-              <td class="best">0.660</td><td class="best">0.647</td><td class="best">0.673</td>
-              <td class="best">1.808 <span class="sub">(5.84&nbsp;/&nbsp;0.61)</span></td><td class="best">4.998 <span class="sub">(10.13&nbsp;/&nbsp;1.39)</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
     </div>
 
     <!-- Generalization -->
@@ -383,10 +348,10 @@
       <p class="eyebrow">Generalization</p>
       <h3 class="subhead">Bare hands, from contact-only supervision</h3>
       <p class="prose">
-        Pressure supervision comes almost entirely from gloved hands. Adding contact-only HOI data
-        costs essentially nothing in-domain but takes bare-hand vertex-level contact on ARCTIC from
-        0.069 to 0.498 &mdash; a 7&times; improvement, and the reason HOPE transfers to the in-the-wild
-        clips above.
+        Pressure supervision comes almost entirely from gloved hands (<b>OT</b>: OpenTouch). Adding
+        contact-only hand-object data (<b>HOI</b>: DexYCB and ARCTIC) costs essentially nothing
+        in-domain but takes bare-hand vertex-level contact on ARCTIC from 0.069 to 0.498 &mdash; a
+        7&times; improvement, and the reason HOPE transfers to the in-the-wild clips above.
       </p>
 
       <figure class="figure">
@@ -402,51 +367,12 @@
         </figcaption>
       </figure>
 
-      <div class="table-wrap">
-        <table>
-          <caption>
-            <b>Table 2.</b> Training-data composition. <b>OT</b>: OpenTouch (force), <b>PV</b>:
-            PressureVisionDB (force), <b>HOI</b>: DexYCB + ARCTIC (contact only).
-          </caption>
-          <thead>
-            <tr class="group">
-              <th colspan="3">Training data</th><th colspan="3">OpenTouch</th><th colspan="2">PVDB</th><th colspan="2">ARCTIC (bare hand)</th>
-            </tr>
-            <tr>
-              <th>OT</th><th>PV</th><th>HOI</th>
-              <th>Frame F1</th><th>Vertex F1</th><th>MAE</th>
-              <th>Frame F1</th><th>MAE</th>
-              <th>Frame F1</th><th>Vertex F1</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="check">&#10003;</td><td class="dash">&ndash;</td><td class="dash">&ndash;</td>
-              <td>0.871</td><td>0.657</td><td class="best">1.840</td>
-              <td>0.725</td><td>0.822</td>
-              <td>0.835</td><td>0.137</td>
-            </tr>
-            <tr>
-              <td class="check">&#10003;</td><td class="check">&#10003;</td><td class="dash">&ndash;</td>
-              <td class="best">0.878</td><td class="best">0.672</td><td>1.841</td>
-              <td class="best">0.908</td><td class="best">0.265</td>
-              <td>0.765</td><td>0.069</td>
-            </tr>
-            <tr class="is-ours">
-              <td class="check">&#10003;</td><td class="check">&#10003;</td><td class="check">&#10003;</td>
-              <td>0.876</td><td>0.671</td><td>1.866</td>
-              <td>0.892</td><td>0.285</td>
-              <td class="best">0.947</td><td class="best">0.498</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
     </div>
 
     <!-- Collapsed extras -->
     <div class="reveal" style="margin-top:3rem">
       <details class="more">
-        <summary>Hand-surface pressure on PressureVisionDB <span>&mdash; Table 3, Fig. 4</span></summary>
+        <summary>Hand-surface pressure on PressureVisionDB <span>&mdash; Fig. 4</span></summary>
         <div class="more__body">
           <p class="prose">
             The same vertex-space model is competitive on frame-level contact and achieves the lowest
@@ -463,22 +389,6 @@
                  alt="Qualitative comparison on PressureVision, with vertex-level predictions projected onto the image plane.">
             <figcaption><b>Qualitative comparison on PressureVision.</b> Our vertex-level predictions are projected onto the image plane for comparison.</figcaption>
           </figure>
-          <div class="table-wrap">
-            <table>
-              <caption><b>Table 3.</b> Hand-surface force estimation on PressureVisionDB.</caption>
-              <thead>
-                <tr class="group">
-                  <th></th><th colspan="3">Frame-level contact</th><th colspan="2">Pixel-level IoU</th><th colspan="2">Vertex-level force</th>
-                </tr>
-                <tr><th>Method</th><th>F1</th><th>P</th><th>R</th><th>Contact</th><th>Volume</th><th>MAE (kPa)</th><th>RMSE (kPa)</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>PressureVision</td><td class="best">0.939</td><td class="best">0.977</td><td>0.904</td><td class="best">0.547</td><td class="best">0.411</td><td>0.471</td><td>3.726</td></tr>
-                <tr><td>PressureVision++</td><td>0.248</td><td>0.963</td><td>0.143</td><td>0.022</td><td>0.021</td><td class="best">0.248</td><td>3.025</td></tr>
-                <tr class="is-ours"><td>HOPE (ours)</td><td>0.905</td><td>0.891</td><td class="best">0.920</td><td>0.328</td><td>0.218</td><td>0.449</td><td class="best">2.314</td></tr>
-              </tbody>
-            </table>
-          </div>
         </div>
       </details>
 
